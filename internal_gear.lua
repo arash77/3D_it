@@ -1,7 +1,7 @@
 -------------------------------------------------------Internal Gear Pump--------------------------------------------------------
 
 ------------------------------------------------Declaration and Calculation End--------------------------------------------------
--- enable_variable_cache = true;                                                                                               -- caches the pointer
+enable_variable_cache = true;                                                                                               -- caches the pointer
 
 ----------------------------------------------Passing parameters to user interface-----------------------------------------------
 z_n=ui_numberBox("Number Of Teeth",20); 						                                                            -- Input for number of teeth, ideal: from 25
