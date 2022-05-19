@@ -196,12 +196,71 @@ function externalGear()
     crescent_rootRadius = r_f;                                                                               -- Root radius of the internal gear
 end
 
+<<<<<<< HEAD
 function internalGear()
     internalGear = gear_profile(z_n-8, m, alpha_t, x_coef_int + 0.1, h_a_coef_p, h_f_coef_p, width)
     r2 = rotate(0,0, rotation*z_n/(z_n-8))                                                                                      -- Internal Gear Rotation
     emit(translate(0,meshDistance,0)*r2*cylinder(2+r_b/2,r_b+15),2)									                            -- Shaft Formation
     emit(translate(0,meshDistance,0)*r2*difference(internalGear,extrude(circle(r_b/2), 0, v(0,0,width), v(1,1,1), 20)),2)       -- Internal Gear Formation
     set_brush_color(2,0,0,0)                                                                                                    -- Set Color for Internal Gear
+=======
+----------------------------------------------------External Gear Formation------------------------------------------------------
+externalGear = gear({z=z_n;m=m;alpha_t=alpha_t;x_coef=x_coef_int;h_a_coef=h_a_coef_p;h_f_coef=h_f_coef_p;width=width})
+
+---------------------Calculation for the centre distance between gears using the profile shift coefficients----------------------
+z_2 = z_n;                 		                                                                                            -- Number of teeth Internal Gear
+z_1 = z_n-8;				 		                                                                                        -- Number of teeth External Gear
+alpha_rad = alpha_t*math.pi/180                                                                                             -- Preassure angle
+inv_a = math.tan(alpha_rad) - alpha_rad;                                                                                    -- Involute function
+inv_aw = ((2*math.tan(alpha_rad) * (x_coef_int - x_coef_ext))/(z_2 - z_1)) + inv_a;                                         -- Involute function working pressure angle
+alpha_aw = wkp(inv_aw)                                                                                                      -- Working pressure angle
+y_c = ((z_2 - z_1) * (math.cos(alpha_rad) - math.cos(alpha_aw)))/ (2* math.cos(alpha_aw));                                  -- Centre distance incremental factor
+meshDistance = (((z_2 - z_1)/2)+y_c) * m;				                                                                    -- Center distance is assagined for cresant calculation
+addOn_distance= m * 2;
+crescent_outerRadius=r_TIF;		                                                                                            -- Radius of the internal gear for the cylinder 
+crescent_clearanceOut=0;		                                                                                            -- Clearance of the internal gear for the cylinder
+crescent_rootRadius=r_f;		                                                                                            -- Root radius of the internal gear
+internal_radius=r_a;																										-- Pitch radius of internal gear
+crescent_cylTop=ccylinder(crescent_outerRadius-crescent_clearanceOut*2,width);	                                            -- Top cylinder for crescent 
+radius=(z_n*m)/2;
+
+----------------------------------------------------Internal Gear Formation------------------------------------------------------
+internalGear = gear({z=z_n-8;m=m;alpha_t=alpha_t;x_coef=x_coef_ext;h_a_coef=h_a_coef_p;h_f_coef=h_f_coef_p;width=width})
+
+--------------------------------------------------------Crescent Filler----------------------------------------------------------
+crescent_innerRadius=r_a;   			                                                                                    -- Radius of the external gear for the cylinder
+crescent_clearanceIn=c;					                                                                                    -- Clearance of the external gear for the cylinder
+crescent_translation=meshDistance;		                                                                                    -- Translation for crescent formation
+crescent_cylBottom=translate(0,crescent_translation,0)*ccylinder(crescent_innerRadius+crescent_clearanceIn*2,width); 	    --Inner circle for internal gear formation
+crescent_cubeRight=translate(crescent_innerRadius+crescent_clearanceOut,meshDistance+m*2,0)*
+                   cube(crescent_rootRadius+crescent_clearanceOut, crescent_rootRadius+crescent_clearanceOut,width+0.1)     -- Cube to remove sharp edges of the crescent
+crescent_cubeLeft=translate(-(crescent_innerRadius+crescent_clearanceOut),meshDistance+m*2,0)*
+                   cube(crescent_rootRadius+crescent_clearanceOut, crescent_rootRadius+crescent_clearanceOut,width+0.1)     -- Cube to remove sharp edges of the crescent
+crescent_Main=translate(0,0,width/2+0.1)*difference(crescent_cylTop,crescent_cylBottom)                                     -- Crescent Filler Formation with sharp edges
+crescent_Full=intersection(difference(crescent_Main,crescent_cubeRight),difference(crescent_Main,crescent_cubeLeft))        -- Crescent Filler Formation without sharp edges
+emit(crescent_Full,0)                                                                                                         -- Crescent Filler Formation
+set_brush_color(0,0.2,0.2,0.2)
+
+-----------------------------------Emitting the Internal Gear, the External Gear, and shaft--------------------------------------
+
+
+
+outer_circle= extrude(circle(internal_radius-0.1), 0, v(0,0,width), v(1,1,1), 20)                                     		-- Outer circle for External gear formation
+r1 = rotate(0,0, rotation)                                                                                                  -- External Gear Rotation
+emit(r1*difference(outer_circle,externalGear),1);                                                                           -- External gear formation
+emit(translate(0,0,-0.1)*cylinder(internal_radius,2),1)															    		-- External gear Base formation
+set_brush_color(1,0.1,0.2,0.2)
+
+flangeCube=translate(0,-meshDistance,0)*cube(addOn_distance*2,addOn_distance*2,width)
+flangeCylinder=cylinder(addOn_distance*2,width+20)
+cube_flange=translate(0,-meshDistance,0)*cube(addOn_distance*2,addOn_distance*2,width+5)
+flangeDiff=difference(extrude(circle(addOn_distance*2), 0, v(0,0,width), v(1,1,1), 20),flangeCube)
+flangeFull=difference(internalGear,flangeDiff)
+r2 = rotate(0,0, rotation*z_2/z_1)                                                                                          -- Internal Gear Rotation
+emit(translate(0,meshDistance,0.1)*r2*difference(flangeCylinder,cube_flange),2)									    	 	-- Shaft Formation
+emit(translate(0,meshDistance,0)*r2*difference(flangeFull,flangeDiff),2)                         						 	-- Internal Gear Formation
+set_brush_color(2,0,0,0)
+>>>>>>> 8c35cc1448036b7857a0de061294c604b8e3afd3
 
     crescent_cylBottom = translate(0,meshDistance,0)*ccylinder(r_a+0.2,width); 	                                                -- Inner circle for internal gear formation
     crescent_cubeRight = translate(r_a,meshDistance+m*2,0)*cube(crescent_rootRadius, crescent_rootRadius,width+0.1)             -- Cube to remove sharp edges of the crescent
