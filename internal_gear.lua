@@ -210,7 +210,7 @@ function internalGear()
     crescent_Full = intersection(difference(crescent_Main,crescent_cubeRight),difference(crescent_Main, crescent_cubeLeft))     -- Crescent Formation without sharp edges
     emit(crescent_Full,0)                                                                                                       -- Crescent Formation
     set_brush_color(0,0.2,0.2,0.2)                                                                                              -- Set Color for Crescent
-    end
+end
 
 ---- Gear Formation ----
 externalGear();
