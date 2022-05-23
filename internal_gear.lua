@@ -203,10 +203,10 @@ function internalGear()
     emit(translate(0,meshDistance,0)*r2*difference(internalGear,extrude(circle(r_b/2), 0, v(0,0,width), v(1,1,1), 20)),2)       -- Internal Gear Formation
     set_brush_color(2,0,0,0)                                                                                                    -- Set Color for Internal Gear
 
-    crescent_cylBottom = translate(0,meshDistance,0)*ccylinder(r_a+0.2,width); 	                                                -- Inner circle for internal gear formation
-    crescent_cubeRight = translate(r_a,meshDistance+m*2,0)*cube(crescent_rootRadius, crescent_rootRadius,width+0.1)             -- Cube to remove sharp edges of the crescent
-    crescent_cubeLeft = translate(-(r_a),meshDistance+m*2,0)*cube(crescent_rootRadius, crescent_rootRadius,width+0.1)           -- Cube to remove sharp edges of the crescent
-    crescent_Main = translate(0,0,width/2+0.1)*difference(ccylinder(crescent_outerRadius-0.2,width), crescent_cylBottom)        -- Crescent Formation with sharp edges
+    crescent_cylBottom = translate(0,meshDistance,0)*ccylinder(r_a+c*2,width); 	                                                -- Inner circle for internal gear formation
+    crescent_cubeRight = translate(r_a+c,meshDistance+m*2,0)*cube(crescent_rootRadius+c, crescent_rootRadius+c,width+0.1)             -- Cube to remove sharp edges of the crescent
+    crescent_cubeLeft = translate(-(r_a),meshDistance+m*2,0)*cube(crescent_rootRadius+c, crescent_rootRadius+c,width+0.1)           -- Cube to remove sharp edges of the crescent
+    crescent_Main = translate(0,0,width/2+0.1)*difference(ccylinder(crescent_outerRadius-c*2,width), crescent_cylBottom)        -- Crescent Formation with sharp edges
     crescent_Full = intersection(difference(crescent_Main,crescent_cubeRight),difference(crescent_Main, crescent_cubeLeft))     -- Crescent Formation without sharp edges
     emit(crescent_Full,0)                                                                                                       -- Crescent Formation
     set_brush_color(0,0.2,0.2,0.2)                                                                                              -- Set Color for Crescent
