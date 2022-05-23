@@ -1,9 +1,9 @@
----- Internal Gear Pump ----
+---- Internal Gear Pump
 
----- Declaration and Calculation End -----
+---- Declaration and Calculation End
 -- enable_variable_cache = true;                                                                                               -- caches the pointer
 
----- Passing parameters to user interface ----
+---- Passing parameters to user interface
 z_n=ui_numberBox("Number Of Teeth for Outer Gear",20); 						                                    -- Input for number of teeth, ideal: from 25
 m=ui_numberBox("Module Of Gear",6);								                                                            -- Module of gear, Ideal Input: 3
 alpha_t=ui_scalarBox("Pressure Angle(Deg)",20,1);				                                                            -- Pressure angle (changes the meshing parameters)
@@ -14,27 +14,27 @@ h_a_coef_p=ui_scalarBox("Addendum Coefficient(mm)",1,0);					                   
 h_f_coef_p=ui_scalarBox("Dedendum Coefficient(mm)",1.25,0);					                                                -- Dedendum height factor
 rotation = ui_numberBox("Rotation",0);                                                                              		-- For rotation
 
---------------------------Function definition for Parametric equations for the involute profile points
+---- Function definition for Parametric equations for the involute profile points
 function tooth_involute(base_radius, inv_alpha) -- inv_alpha = Involute angle
     return v(base_radius*(math.sin(inv_alpha) - inv_alpha*math.cos(inv_alpha)), base_radius*(math.cos(inv_alpha) + inv_alpha* math.sin(inv_alpha)))
 end
 
------------------------------------Function defining for mirroring or inverting profile points-----------------------------------
+---- Function defining for mirroring or inverting profile points
 function tooth_mirror(coord) 
 	return v(-coord.x, coord.y) 
 end
 
----------------------------------------------Function defining the rotational matrix---------------------------------------------
+---- Function defining the rotational matrix
 function rotate_points(angle, coord)                                                                                        -- angle = angle, coord = co-ordinates
     return v(math.cos(angle) * coord.x + math.sin(angle) * coord.y, math.cos(angle) * coord.y - math.sin(angle) * coord.x)
 end
 
---------------------------------------Function defining angle between corresponding points---------------------------------------
+---- Function defining angle between corresponding points
 function involute_angle(r_p1, r_p2)                                                                                       
 	return (math.sqrt((r_p2 * r_p2 - r_p1 * r_p1) / (r_p1 * r_p1))) 
 end
 
-----------------------------Function Working Pressure angle -------------------
+---- Function Working Pressure angle
 function wkp(x)
 	return (((math.pow(3,(1/3)))*(math.pow(x,(1/3)))) - (2*x/5) + (math.pow(9/175*3,(2/3)))*(math.pow(x,(5/3))) - (math.pow(2/175*3, (1/3)))
 						*(math.pow(x,(7/3))) - ((144/67375)*(math.pow(x,(9/3))) + (3258/3128215)*(math.pow(3,(2/3)))*(math.pow(x,(11/3)))
@@ -42,7 +42,7 @@ function wkp(x)
 						+ (5169659643/95304506171875)*(math.pow(3,(2/3)))*(math.pow(x,(17/3)))))
 end
 
-------------------------Function for the calculation for the required Internal and External Gear Profiles------------------------
+---- Function for the calculation for the required Internal and External Gear Profiles
 function gear_profile(z_t, m_t, alpha_t, x_coef, h_a_coef, h_f_coef, width)
     local inv_xy = {}                                                                                                       -- Definition of the input parameters and calculation of the other base parameters for the involute profile.
     if alpha_t < 4 then
@@ -113,7 +113,7 @@ function gear_profile(z_t, m_t, alpha_t, x_coef, h_a_coef, h_f_coef, width)
     return linear_extrude(v(0,0,width),inv_xy)
 end
 
----- Function defining the parametrical equation for the circle ----
+---- Function defining the parametrical equation for the circle
 function circle(r)                                                                                                          -- r -radius of circle
   local x, y = 0, 0
   local XY={}
@@ -124,7 +124,7 @@ function circle(r)                                                              
   return XY
 end
 
----- For Internal Gear Extrude ----
+---- For Internal Gear Extrude
 function extrude(Contour, angle, dir_v, scale_v, z_steps)
 -- extrude a Contour to a shape by turning the contour to angle in z_steps
 -- extrude a Contour in a dircetion given by the vector dir_v
@@ -212,6 +212,6 @@ function internalGear()
     set_brush_color(0,0.2,0.2,0.2)                                                                                              -- Set Color for Crescent
 end
 
----- Gear Formation ----
+---- Gear Formation
 externalGear();
 internalGear();
