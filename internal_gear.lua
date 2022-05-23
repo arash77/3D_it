@@ -1,9 +1,9 @@
--------------------------------------------------------Internal Gear Pump--------------------------------------------------------
+---- Internal Gear Pump ----
 
-------------------------------------------------Declaration and Calculation End--------------------------------------------------
+---- Declaration and Calculation End -----
 -- enable_variable_cache = true;                                                                                               -- caches the pointer
 
-----------------------------------------------Passing parameters to user interface-----------------------------------------------
+---- Passing parameters to user interface ----
 z_n=ui_numberBox("Number Of Teeth for Outer Gear",20); 						                                    -- Input for number of teeth, ideal: from 25
 m=ui_numberBox("Module Of Gear",6);								                                                            -- Module of gear, Ideal Input: 3
 alpha_t=ui_scalarBox("Pressure Angle(Deg)",20,1);				                                                            -- Pressure angle (changes the meshing parameters)
@@ -113,7 +113,7 @@ function gear_profile(z_t, m_t, alpha_t, x_coef, h_a_coef, h_f_coef, width)
     return linear_extrude(v(0,0,width),inv_xy)
 end
 
------------------------------------Function defining the parametrical equation for the circle------------------------------------
+---- Function defining the parametrical equation for the circle ----
 function circle(r)                                                                                                          -- r -radius of circle
   local x, y = 0, 0
   local XY={}
@@ -124,7 +124,7 @@ function circle(r)                                                              
   return XY
 end
 
-----------------------------------------------------For Internal Gear Extrude----------------------------------------------------
+---- For Internal Gear Extrude ----
 function extrude(Contour, angle, dir_v, scale_v, z_steps)
 -- extrude a Contour to a shape by turning the contour to angle in z_steps
 -- extrude a Contour in a dircetion given by the vector dir_v
