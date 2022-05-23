@@ -14,7 +14,7 @@ h_a_coef_p=ui_scalarBox("Addendum Coefficient(mm)",1,0);					                   
 h_f_coef_p=ui_scalarBox("Dedendum Coefficient(mm)",1.25,0);					                                                -- Dedendum height factor
 rotation = ui_numberBox("Rotation",0);                                                                              		-- For rotation
 
---------------------------Function definition for Parametric equations for the involute profile points---------------------------
+--------------------------Function definition for Parametric equations for the involute profile points
 function tooth_involute(base_radius, inv_alpha) -- inv_alpha = Involute angle
     return v(base_radius*(math.sin(inv_alpha) - inv_alpha*math.cos(inv_alpha)), base_radius*(math.cos(inv_alpha) + inv_alpha* math.sin(inv_alpha)))
 end
