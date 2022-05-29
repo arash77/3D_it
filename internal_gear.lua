@@ -14,10 +14,10 @@ m = ui_numberBox("Module Of Gear", 6);  -- Module
 alpha_t = ui_scalarBox("Pressure Angle", 20, 1);  -- Pressure angle
 h_a_coef_p = ui_scalarBox("Addendum Coef(mm)", 1, 0);  -- Addendum height
 h_f_coef_p = ui_scalarBox("Dedendum Coef(mm)", 1.25, 0);  -- Dedendum height
-x_coef_int = ui_scalarBox("Internal Profile Shift(mm)", -0.2, 0.1);  -- Profile shift factor for internal gear
-x_coef_ext = ui_scalarBox("External Profile Shift(mm)", -0.1, 0.1);  -- Profile shift factor for external gear
+x_coef_int = ui_scalarBox("Internal Profile Shift(mm)", 0.1, 0.05);  -- Profile shift factor for internal gear
+x_coef_ext = ui_scalarBox("External Profile Shift(mm)", 0, 0.05);  -- Profile shift factor for external gear
 b = ui_numberBox("Width(mm)", 10);  -- Thickness of the gear
-a = ui_numberBox("center distance", 10);  --center
+--c_t = ui_numberBox("Clearance", 0.1,0.05);  -- Thickness of the gear
 rotation = ui_numberBox("Rotate", 0);  -- Rotation
 
 
@@ -42,16 +42,18 @@ function mirror(point)
 end
 
 ---- Function for  Internal and External Gear Profiles
-function gearProfile(z, m_n, alpha_t, x_coef, h_a_coef, h_f_coef, b, t)
+function gearProfile(z, m_n, alpha_t, x_coef, h_a_coef, h_f_coef, b, w,c_t)
     local inv_xy = {}
-    if alpha_t < 4 then
-        alpha_t = 5;
-    end
+    
     alpha = alpha_t * math.pi / 180;  -- Pressure angle
-    c = 0.1 * m_n;  -- Clearance
     h_a_coef = h_a_coef;  -- Addendum coefficient
     h_f_coef = h_f_coef;  -- Dedendum coefficient
+    c = 0.1 * m_n;  -- Clearance
     x_coef = x_coef;  -- Profile shift
+    if x_coef<0 then
+        x_coef=0;
+    end
+  
 
 
     -- Formula calculations for the gear profile
@@ -64,12 +66,18 @@ function gearProfile(z, m_n, alpha_t, x_coef, h_a_coef, h_f_coef, b, t)
 
     h_a = m_n * h_a_coef;  -- Addendum
     h_f = m_n * h_f_coef -- Dedendum
-
-    d_a = (d_p + (2 * m_n * (1 + x_coef)));  -- Addendum diameter
+    
+    if w == 2 then
+        d_a = (d_p + (2 * m_n * (1 + x_coef)));  -- Addendum diameter
+    end
+    if w== 1 then
+    d_a = (d_p + (2 * m_n * (1 - x_coef)));  -- Addendum diameter
+    end
     r_a = d_a / 2 -- Addendum radius
 
-    d_f = m_n * z + 2 * x_coef * m_n - 2 * (h_f) -- Root diamter
-    r_f = d_f / 2 -- Root_radius
+
+    d_f = d_a + m_n * 2 *(h_a_coef+h_f_coef); -- Root diamter
+    r_f = d_f / 2; -- Root_radius
 
     -- Involute function
     inv_a = math.tan(alpha) - alpha;
@@ -92,16 +100,16 @@ function gearProfile(z, m_n, alpha_t, x_coef, h_a_coef, h_f_coef, b, t)
     -- loops for generation points
 
     tooth_ang = (((math.pi * m_n / 2) + 2 * m_n * x_coef * math.tan(alpha)) / r_p + 2 * math.tan(alpha) - 2 * alpha)
-    res = 30;
+    steps = 30;
     for i = 1, z do
         th = 2 * math.pi
         AngelS = involute_angle(r_b, r_TIF);  -- Start angle
         AngelE = involute_angle(r_TIF, r_a);  -- End asngle
-        for j = 1, res do
-            inv_xy[#inv_xy + 1] = p_rotate(th * i / z, involute_t(r_TIF, ((AngelE) * j / res))) -- firsr involute face
+        for j = 1, steps do
+            inv_xy[#inv_xy + 1] = p_rotate(th * i / z, involute_t(r_TIF, ((AngelE) * j / steps))) -- firsr involute face
         end
-        for j = res, 1, -1 do
-            inv_xy[#inv_xy + 1] = p_rotate(th * i / z, p_rotate(angel, mirror(involute_t(r_TIF, ((AngelE) * j / res))))) -- Mirroring
+        for j = steps, 1, -1 do
+            inv_xy[#inv_xy + 1] = p_rotate(th * i / z, p_rotate(angel, mirror(involute_t(r_TIF, ((AngelE) * j / steps))))) -- Mirroring
         end
     end
     inv_xy[#inv_xy + 1] = inv_xy[1] --table of values
@@ -189,13 +197,13 @@ function center() --Calculation for the centre using the profile shift coefficie
 
     alpha_rad = alpha_t * math.pi / 180 -- Preassure angle
     inv_a = math.tan(alpha_rad) - alpha_rad;  -- Involute function
-    inv_aw = ((2 * math.tan(alpha_rad) * (-0.1)) / (z_2 - z_1)) + inv_a;  -- Involute function working pressure angle
+    inv_aw = ((2 * math.tan(alpha_rad) * (x_coef_int-x_coef_ext)) / (z_2 - z_1)) + inv_a;  -- Involute function working pressure angle
 
     -- Working preassure angle
     alpha_aw = WorkingAngelF(inv_aw);
     -- Centre distance coeficiant factor
-    y = ((z_2 - z_1) * (math.cos(alpha_rad) - math.cos(alpha_aw))) / (2 * math.cos(alpha_aw));
-
+    y = (((z_2 - z_1) / 2) * ((math.cos(alpha_rad)/math.cos(alpha_aw)))-1);
+    y = ((z_2 - z_1) * (math.cos(alpha_rad) - math.cos(alpha_aw)))/ (2* math.cos(alpha_aw));
     -- Center distance between Gears
     a_x = (((z_2 - z_1) / 2) + y) * m;  -- Center distance
     meshDistance = a_x;
@@ -205,7 +213,7 @@ center();
 
 function gear_formation()
     -- Formation of rotor gear
-    rotor_gear = gearProfile(z_n, m, alpha_t, x_coef_int, h_a_coef_p, h_f_coef_p, b);  -- Rotor gear
+    rotor_gear = gearProfile(z_n, m, alpha_t, x_coef_int, h_a_coef_p, h_f_coef_p, b,2);  -- Rotor gear
     rot_rotor = rotate(0, 0, rotation);  -- Rotation of rotor gear
     emit(translate(0, 0, -0.1) * cylinder(r_a, 2), 1); -- Rotor gear Base formation
     emit(rot_rotor * difference(extrude(circle(r_a - 0.1), 0, v(0, 0, b), v(1, 1, 1), 20), rotor_gear), 1); -- Rotor gear formation
@@ -220,7 +228,7 @@ function gear_formation()
     emit(intersection(difference(gear_housing, inlet), difference(gear_housing, outlet)), 0); -- Gear housing formation
     emit(translate(0, 0, -0.5) * cylinder(r_a + 16, 0.5), 0); -- Base for Gear housing formation
     -- Formation of idler gear
-    idler_gear = gearProfile(z_n - 8, m, alpha_t, x_coef_int - 0.1, h_a_coef_p, h_f_coef_p, b);  -- Idler gear
+    idler_gear = gearProfile(z_n - 8, m, alpha_t, x_coef_ext, h_a_coef_p, h_f_coef_p, b,1);  -- Idler gear
     rot_idler = rotate(0, 0, rotation * z_n / (z_n - 8));  -- Rotation of idler gear
     emit(translate(0, meshDistance, 0) * rot_idler * cylinder(2 + r_b / 2, r_b + 15), 2); -- Shaft formation
     emit(translate(0, meshDistance, 0) * rot_idler * difference(idler_gear, extrude(circle(r_b / 2), 0, v(0, 0, b), v(1, 1, 1), 20)), 2); -- Idler gear formation
