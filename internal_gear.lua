@@ -13,6 +13,7 @@ h_f_coef_p=ui_scalarBox("Dedendum Coef(mm)",1.25,0);					 -- Dedendum height
 x_coef_int=ui_scalarBox("Internal Profile Shift(mm)",-0.2,0.1);	         -- Profile shift factor for internal gear
 x_coef_ext=ui_scalarBox("External Profile Shift(mm)",-0.1,0.1);	         -- Profile shift factor for external gear
 b=ui_numberBox("Width(mm)",10);	 -- Thickness of the gear
+a=ui_numberBox("center distance",10);						             --center 
 rotation = ui_numberBox("Rotate",0);                             -- Rotation
 
 
@@ -185,9 +186,8 @@ function center()  --Calculation for the centre using the profile shift coeffici
     z_2 = z_n;                 		                                                                                            -- Number of teeth Internal Gear
     z_1 = z_n-8;				 		                                                                                        -- Number of teeth External Gear
 
-    alpha_rad = alpha_t*math.pi/180 
-    y=((a/m)-(z_2-z_1)/2);                                                                                           -- Preassure angle 
-    inv_a = math.tan(alpha_rad) - alpha_rad;                                                                                    -- Involute function 
+    alpha_rad = alpha_t*math.pi/180                            -- Preassure angle 
+    inv_a = math.tan(alpha_rad) - alpha_rad;                   -- Involute function 
     inv_aw = ((2*math.tan(alpha_rad) * (-0.1))/(z_2 - z_1)) + inv_a;                                         -- Involute function working pressure angle 
 
     -- Working preassure angle                                                                                          -- Working pressure angle 
