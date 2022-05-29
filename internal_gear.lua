@@ -10,14 +10,13 @@
 
 ---- Input parameters using Interface
 z_n = ui_numberBox("Number Of Teeth for External Gear", 25);  --number of teeth
-m = ui_numberBox("Module Of Gear", 6);  -- Module
+m = ui_numberBox("Module Of Gear", 4);  -- Module
 alpha_t = ui_scalarBox("Pressure Angle", 20, 1);  -- Pressure angle
 h_a_coef_p = ui_scalarBox("Addendum Coef(mm)", 1, 0);  -- Addendum height
 h_f_coef_p = ui_scalarBox("Dedendum Coef(mm)", 1.25, 0);  -- Dedendum height
 x_coef_int = ui_scalarBox("Internal Profile Shift(mm)", 0.1, 0.05);  -- Profile shift factor for internal gear
 x_coef_ext = ui_scalarBox("External Profile Shift(mm)", 0, 0.05);  -- Profile shift factor for external gear
 b = ui_numberBox("Width(mm)", 10);  -- Thickness of the gear
---c_t = ui_numberBox("Clearance", 0.1,0.05);  -- Thickness of the gear
 rotation = ui_numberBox("Rotate", 0);  -- Rotation
 
 
@@ -55,7 +54,7 @@ function gearProfile(z, m_n, alpha_t, x_coef, h_a_coef, h_f_coef, b, w,c_t)
     end
   
 
-
+w=3;
     -- Formula calculations for the gear profile
 
     d_p = z * m_n -- Pitch Diamter
@@ -64,19 +63,14 @@ function gearProfile(z, m_n, alpha_t, x_coef, h_a_coef, h_f_coef, b, w,c_t)
     d_b = d_p * math.cos(alpha);  -- Base diameter of gear
     r_b = d_b / 2 -- Base radius
 
-    h_a = m_n * h_a_coef;  -- Addendum
-    h_f = m_n * h_f_coef -- Dedendum
+    h_f = m_n * (h_f_coef) -- Dedendum
     
-    if w == 2 then
-        d_a = (d_p + (2 * m_n * (1 + x_coef)));  -- Addendum diameter
-    end
-    if w== 1 then
-    d_a = (d_p + (2 * m_n * (1 - x_coef)));  -- Addendum diameter
-    end
-    r_a = d_a / 2 -- Addendum radius
+   
+    h_a = m_n * (h_a_coef);  -- Addendum
+    d_a = (d_p + (2 * m_n * (1 + x_coef))); 
+    r_a = d_a / 2; -- Addendum radius
 
-
-    d_f = d_a + m_n * 2 *(h_a_coef+h_f_coef); -- Root diamter
+    d_f = m_n*z+ 2*x_coef*m_n - 2*(h_f);
     r_f = d_f / 2; -- Root_radius
 
     -- Involute function
@@ -187,7 +181,7 @@ end
 
 ---- Function Working Pressure angle
 function WorkingAngelF(x) -- Acoording to 1992 [Harry Cheng], derivation of an explicit solution of the inverse involute function
-    return (((math.pow(3 * x, (1 / 3)))) - (2 * x / 5) + (math.pow(9 / 175 * 3, (2 / 3))) * (math.pow(x, (5 / 3))) - (math.pow(2 / 175 * 3, (1 / 3))) * (math.pow(x, (7 / 3))) - ((144 / 67375) * (math.pow(x, (9 / 3))) + (3258 / 3128215) * (math.pow(3, (2 / 3))) * (math.pow(x, (11 / 3))) - (49711 / 153278125) * (math.pow(3, (1 / 3))) * (math.pow(x, (13 / 3))) - (1130112 / 9306171875) * (math.pow(x, (15 / 3))) + (5169659643 / 95304506171875) * (math.pow(3, (2 / 3))) * (math.pow(x, (17 / 3)))))
+ return (((math.pow(3 * x, (1 / 3)))) - (2 * x / 5) + (math.pow(9 / 175 * 3, (2 / 3))) * (math.pow(x, (5 / 3))) - (math.pow(2 / 175 * 3, (1 / 3))) * (math.pow(x, (7 / 3))) - ((144 / 67375) * (math.pow(x, (9 / 3))) + (3258 / 3128215) * (math.pow(3, (2 / 3))) * (math.pow(x, (11 / 3))) - (49711 / 153278125) * (math.pow(3, (1 / 3))) * (math.pow(x, (13 / 3))) - (1130112 / 9306171875) * (math.pow(x, (15 / 3))) + (5169659643 / 95304506171875) * (math.pow(3, (2 / 3))) * (math.pow(x, (17 / 3)))))
 end
 
 function center() --Calculation for the centre using the profile shift coefficients
@@ -197,12 +191,11 @@ function center() --Calculation for the centre using the profile shift coefficie
 
     alpha_rad = alpha_t * math.pi / 180 -- Preassure angle
     inv_a = math.tan(alpha_rad) - alpha_rad;  -- Involute function
-    inv_aw = ((2 * math.tan(alpha_rad) * (x_coef_int-x_coef_ext)) / (z_2 - z_1)) + inv_a;  -- Involute function working pressure angle
+    inv_aw = ((2 * math.tan(alpha_rad) * (x_coef_ext-x_coef_int)) / (z_2 - z_1)) + inv_a;  -- Involute function working pressure angle
 
     -- Working preassure angle
     alpha_aw = WorkingAngelF(inv_aw);
     -- Centre distance coeficiant factor
-    y = (((z_2 - z_1) / 2) * ((math.cos(alpha_rad)/math.cos(alpha_aw)))-1);
     y = ((z_2 - z_1) * (math.cos(alpha_rad) - math.cos(alpha_aw)))/ (2* math.cos(alpha_aw));
     -- Center distance between Gears
     a_x = (((z_2 - z_1) / 2) + y) * m;  -- Center distance
