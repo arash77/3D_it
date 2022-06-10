@@ -9,8 +9,8 @@
 
 
 ---- Input parameters using Interface
-z_2 = ui_numberBox("Number Of Teeth for External Gear", 25);  --number of teeth external
-z_1 = ui_numberBox("Number Of Teeth for Internal Gear", 17);  --number of teeth internal
+z_2 = ui_numberBox("Number Of Teeth for Rotor Gear", 25);  --number of teeth Rotor
+z_1 = ui_numberBox("Number Of Teeth for Idler Gear", 17);  --number of teeth Idler
 m = ui_numberBox("Module Of Gear", 4);  -- Module
 alpha_t = ui_scalarBox("Pressure Angle", 20, 1);  -- Pressure angle
 h_a_coef_p = ui_scalarBox("Addendum Coef(mm)", 1, 0.05);  -- Addendum height
