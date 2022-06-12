@@ -212,7 +212,8 @@ function gear_formation()
     local rotor_gear = gearProfile(z_2, m, alpha_t, x_coef_int, h_a_coef_p, h_f_coef_p, b);  -- Rotor gear
     local rot_rotor = rotate(0, 0, rotation);  -- Rotation of rotor gear
     emit(translate(0, 0, 20) * translate(0, 0, -0.1) * cylinder(r_a, 2), 1); -- Rotor gear Base formation
-    emit(translate(0, 0, 20) * rot_rotor * difference(extrude(circle(r_a - 0.1), 0, v(0, 0, b), v(1, 1, 1), 20), rotor_gear), 1); -- Rotor gear formation
+    emit(translate(0, 0, 20) * rot_rotor *
+        difference(extrude(circle(r_a - 0.1), 0, v(0, 0, b), v(1, 1, 1), 20), rotor_gear), 1); -- Rotor gear formation
     set_brush_color(1, 0.3, 0.3, 0.4); -- Set color for rotor gear
 
     -- Parameters for the crescent calculation
@@ -232,14 +233,15 @@ function gear_formation()
     local outcyl2 = outlet_trans * translate(0, b - 2, 0) * cylinder(b / 2 - 1, h);  -- Outlet cylinder 2
     local outcube = outlet_trans * translate(0, b / 2 - 1, 0) * cube(b - 2, b - 1, h);  -- Outlet cube
     local outlet = union(union(outcyl1, outcyl2), outcube);  -- Outlet hole
-    local front_door = translate(0, 0, b + 0.2) * cylinder(r_a + 16, 0.5); -- Front door for crescent
+    local front_door = translate(0, 0, b + 0.2) * cylinder(r_a + 16, 0.5);  -- Front door for crescent
     local hole_shaft = translate(0, meshDistance, b + 0.2) *
-        extrude(circle(m * 4 + 0.5), 0, v(0, 0, 0.5), v(1, 1, 1), 20); -- Hole of the idler shaft
-    local total_hole = (translate(r_a + 9, 0, -1) * cylinder(2.5, b + 5)); -- Holes for bolts
+        extrude(circle(m * 4 + 0.5), 0, v(0, 0, 0.5), v(1, 1, 1), 20);  -- Hole of the idler shaft
+    local total_hole = (translate(r_a + 9, 0, -1) * cylinder(2.5, b + 5));  -- Holes for bolts
     for i = 360 / 4, 360, 360 / 4 do
         total_hole = union { total_hole, rotate(0, 0, i) * total_hole };  -- Repeat for 4 holes
     end
-    emit(translate(0, 0, 80-0.6) * intersection((difference(front_door, hole_shaft)), (difference(front_door, total_hole))), 0); --Front door formation
+    emit(translate(0, 0, 80 - 0.6) *
+        intersection((difference(front_door, hole_shaft)), (difference(front_door, total_hole))), 0); --Front door formation
     emit(intersection(intersection(difference(gear_housing, inlet), difference(gear_housing, outlet)),
         difference(gear_housing, total_hole)), 0); -- Gear housing formation
     emit(difference(translate(0, 0, -0.5) * cylinder(r_a + 16, 0.5), total_hole), 0); -- Base for Gear housing formation
@@ -260,7 +262,8 @@ function gear_formation()
         cube(crescent_root_radius + c, crescent_root_radius + c, b + 0.1);  -- Left cube to remove sharp edges of the crescent
     local crescent_main = translate(0, 0, b / 2 + 0.1) *
         difference(ccylinder(crescent_outer_radius - c * 2, b), crescent_circle);  -- Crescent with sharp edges
-    emit(translate(0, 0, 80) * intersection(difference(crescent_main, crescent_cube_right), difference(crescent_main, crescent_cube_left)), 0); -- Crescent formation without sharp edges
+    emit(translate(0, 0, 80) *
+        intersection(difference(crescent_main, crescent_cube_right), difference(crescent_main, crescent_cube_left)), 0); -- Crescent formation without sharp edges
     set_brush_color(0, 0.2, 0.2, 0.2); -- Set color for crescent and gear housing
 end
 
