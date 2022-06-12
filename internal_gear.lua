@@ -23,7 +23,8 @@ rotation = ui_numberBox("Rotate", 0);  -- Rotation
 
 ---- Function for involute profile points
 function involute_t(r_b, inv_alpha) -- r_b
-    return v(r_b * (math.sin(inv_alpha) - inv_alpha * math.cos(inv_alpha)), r_b * (math.cos(inv_alpha) + inv_alpha * math.sin(inv_alpha)))
+    return v(r_b * (math.sin(inv_alpha) - inv_alpha * math.cos(inv_alpha)),
+        r_b * (math.cos(inv_alpha) + inv_alpha * math.sin(inv_alpha)))
 end
 
 ---- Function for involute angle
@@ -76,8 +77,10 @@ function gearProfile(z, m_n, alpha_t, x_coef, h_a_coef, h_f_coef, b)
     inv_a = math.tan(alpha) - alpha;
 
     -- True Involute Diameter:
-    local fp = ((m_n * ((math.pi / 4) - (math.tan(alpha))) - c * math.tan(alpha)) * (1 + math.sin(alpha))) / (math.cos(alpha))
-    local d_TIF = math.sqrt(math.pow(d_p * math.sin(alpha) - 2 * (h_a - (m_n * x_coef) - fp * (1 - math.sin(alpha))) / (math.sin(alpha)), 2) + d_b * d_b) -- True involute diameter
+    local fp = ((m_n * ((math.pi / 4) - (math.tan(alpha))) - c * math.tan(alpha)) * (1 + math.sin(alpha))) /
+        (math.cos(alpha))
+    local d_TIF = math.sqrt(math.pow(d_p * math.sin(alpha) -
+        2 * (h_a - (m_n * x_coef) - fp * (1 - math.sin(alpha))) / (math.sin(alpha)), 2) + d_b * d_b) -- True involute diameter
     r_TIF = d_TIF / 2;  --radius
 
     -- Tooth thickness -->> pitch circle
@@ -137,7 +140,8 @@ function extrude(Contour, angle, dir_v, scale_v, z_steps)
         local dir_vh = dir_v * j / (z_steps - 1)
         local scale_vh = (scale_v - v(1, 1, 1)) * (j / (z_steps - 1)) + v(1, 1, 1)
         for i = 1, n_cont - 1 do
-            Vertex[i + j * n_cont] = v((dir_vh.x + scale_vh.x * (Contour[i].x * math.cos(phi) - Contour[i].y * math.sin(phi))),
+            Vertex[i + j * n_cont] = v((
+                dir_vh.x + scale_vh.x * (Contour[i].x * math.cos(phi) - Contour[i].y * math.sin(phi))),
                 (dir_vh.y + scale_vh.y * (Contour[i].x * math.sin(phi) + Contour[i].y * math.cos(phi))),
                 (dir_vh.z * scale_vh.z))
         end
@@ -177,7 +181,14 @@ end
 
 ---- Function Working Pressure angle
 function WorkingAngelF(x) -- Acoording to 1992 [Harry Cheng], derivation of an explicit solution of the inverse involute function
-    return (((math.pow(3 * x, (1 / 3)))) - (2 * x / 5) + (math.pow(9 / 175 * 3, (2 / 3))) * (math.pow(x, (5 / 3))) - (math.pow(2 / 175 * 3, (1 / 3))) * (math.pow(x, (7 / 3))) - ((144 / 67375) * (math.pow(x, (9 / 3))) + (3258 / 3128215) * (math.pow(3, (2 / 3))) * (math.pow(x, (11 / 3))) - (49711 / 153278125) * (math.pow(3, (1 / 3))) * (math.pow(x, (13 / 3))) - (1130112 / 9306171875) * (math.pow(x, (15 / 3))) + (5169659643 / 95304506171875) * (math.pow(3, (2 / 3))) * (math.pow(x, (17 / 3)))))
+    return (
+        ((math.pow(3 * x, (1 / 3)))) - (2 * x / 5) + (math.pow(9 / 175 * 3, (2 / 3))) * (math.pow(x, (5 / 3))) -
+            (math.pow(2 / 175 * 3, (1 / 3))) * (math.pow(x, (7 / 3))) -
+            (
+            (144 / 67375) * (math.pow(x, (9 / 3))) + (3258 / 3128215) * (math.pow(3, (2 / 3))) * (math.pow(x, (11 / 3)))
+                - (49711 / 153278125) * (math.pow(3, (1 / 3))) * (math.pow(x, (13 / 3))) -
+                (1130112 / 9306171875) * (math.pow(x, (15 / 3))) +
+                (5169659643 / 95304506171875) * (math.pow(3, (2 / 3))) * (math.pow(x, (17 / 3)))))
 end
 
 function center() --Calculation for the centre using the profile shift coefficients
@@ -200,46 +211,58 @@ function gear_formation()
     -- Formation of rotor gear
     local rotor_gear = gearProfile(z_2, m, alpha_t, x_coef_int, h_a_coef_p, h_f_coef_p, b);  -- Rotor gear
     local rot_rotor = rotate(0, 0, rotation);  -- Rotation of rotor gear
-    emit(translate(0, 0, -0.1) * cylinder(r_a, 2), 1); -- Rotor gear Base formation
-    emit(rot_rotor * difference(extrude(circle(r_a - 0.1), 0, v(0, 0, b), v(1, 1, 1), 20), rotor_gear), 1); -- Rotor gear formation
+    emit(translate(0, 0, 20) * translate(0, 0, -0.1) * cylinder(r_a, 2), 1); -- Rotor gear Base formation
+    emit(translate(0, 0, 20) * rot_rotor * difference(extrude(circle(r_a - 0.1), 0, v(0, 0, b), v(1, 1, 1), 20), rotor_gear), 1); -- Rotor gear formation
     set_brush_color(1, 0.3, 0.3, 0.4); -- Set color for rotor gear
-	
+
     -- Parameters for the crescent calculation
     local crescent_outer_radius = r_TIF;  -- Radius of the rotor gear
     local crescent_root_radius = r_f;  -- Root radius of the rotor gear
-	
+
     -- Formation of Gear housing
     local gear_housing = difference(cylinder(r_a + 16, b), cylinder(r_a + 1.75, b));  -- Gear housing cylinder
     local h = (z_2 * m) / 2 + m * 2 + 16;
-    local inlet_trans = rotate(45, Z) * translate(h, 0, b / 2 + 0.2) * rotate(270, Y); -- Inlet translate
-    local outlet_trans = rotate(45, Z) * translate(0, h, b / 2 + 0.2) * rotate(270, -X) * rotate(90, -Z); -- Outlet translate
+    local inlet_trans = rotate(45, Z) * translate(h, 0, b / 2 + 0.2) * rotate(270, Y);  -- Inlet translate
+    local outlet_trans = rotate(45, Z) * translate(0, h, b / 2 + 0.2) * rotate(270, -X) * rotate(90, -Z);  -- Outlet translate
     local incyl1 = inlet_trans * cylinder(b / 2 - 1, h);  -- Inlet cylinder 1
     local incyl2 = inlet_trans * translate(0, b - 2, 0) * cylinder(b / 2 - 1, h);  -- Inlet cylinder 2
-    local incube = inlet_trans * translate(0, b / 2 - 1, 0) * cube(b - 2, b - 1, h); -- Inlet cube
-    local inlet = union(union(incyl1,incyl2),incube); -- Inlet hole
+    local incube = inlet_trans * translate(0, b / 2 - 1, 0) * cube(b - 2, b - 1, h);  -- Inlet cube
+    local inlet = union(union(incyl1, incyl2), incube);  -- Inlet hole
     local outcyl1 = outlet_trans * cylinder(b / 2 - 1, h);  -- Outlet cylinder 1
     local outcyl2 = outlet_trans * translate(0, b - 2, 0) * cylinder(b / 2 - 1, h);  -- Outlet cylinder 2
-    local outcube = outlet_trans * translate(0, b / 2 - 1, 0) * cube(b - 2, b - 1, h); -- Outlet cube
-    local outlet = union(union(outcyl1,outcyl2),outcube); -- Outlet hole
-    emit(intersection(difference(gear_housing, inlet), difference(gear_housing, outlet)), 0); -- Gear housing formation
-    emit(translate(0, 0, -0.5) * cylinder(r_a + 16, 0.5), 0); -- Base for Gear housing formation
-	
+    local outcube = outlet_trans * translate(0, b / 2 - 1, 0) * cube(b - 2, b - 1, h);  -- Outlet cube
+    local outlet = union(union(outcyl1, outcyl2), outcube);  -- Outlet hole
+    local front_door = translate(0, 0, b + 0.2) * cylinder(r_a + 16, 0.5); -- Front door for crescent
+    local hole_shaft = translate(0, meshDistance, b + 0.2) *
+        extrude(circle(m * 4 + 0.5), 0, v(0, 0, 0.5), v(1, 1, 1), 20); -- Hole of the idler shaft
+    local total_hole = (translate(r_a + 9, 0, -1) * cylinder(2.5, b + 5)); -- Holes for bolts
+    for i = 360 / 4, 360, 360 / 4 do
+        total_hole = union { total_hole, rotate(0, 0, i) * total_hole };  -- Repeat for 4 holes
+    end
+    emit(translate(0, 0, 80-0.6) * intersection((difference(front_door, hole_shaft)), (difference(front_door, total_hole))), 0); --Front door formation
+    emit(intersection(intersection(difference(gear_housing, inlet), difference(gear_housing, outlet)),
+        difference(gear_housing, total_hole)), 0); -- Gear housing formation
+    emit(difference(translate(0, 0, -0.5) * cylinder(r_a + 16, 0.5), total_hole), 0); -- Base for Gear housing formation
+
     -- Formation of idler gear
     local idler_gear = gearProfile(z_1, m, alpha_t, x_coef_ext, h_a_coef_p, h_f_coef_p, b);  -- Idler gear
     local rot_idler = rotate(0, 0, rotation * z_2 / z_1);  -- Rotation of idler gear
-    emit(translate(0, meshDistance, 0) * rot_idler * cylinder(2 + r_b / 2, r_b + 15), 2); -- Shaft formation
-    emit(translate(0, meshDistance, 0) * rot_idler * difference(idler_gear, extrude(circle(r_b / 2), 0, v(0, 0, b), v(1, 1, 1), 20)), 2); -- Idler gear formation
+    emit(translate(0, 0, 40) * translate(0, meshDistance, 0) * cylinder(m * 4, r_b + 15), 2); -- Shaft formation
+    emit(translate(0, 0, 40) * translate(0, meshDistance, 0) * rot_idler *
+        difference(idler_gear, extrude(circle(r_b / 2), 0, v(0, 0, b), v(1, 1, 1), 20)), 2); -- Idler gear formation
     set_brush_color(2, 0, 0, 0); -- Set color for idler gear
-	
+
     -- Formation of the crescent
     local crescent_circle = translate(0, meshDistance, 0) * ccylinder(r_a + c * 2, b);  -- Cylinder for crescent
-    local crescent_cube_right = translate(r_a + c, meshDistance + m * 2, 0) * cube(crescent_root_radius + c, crescent_root_radius + c, b + 0.1);  -- Right cube to remove sharp edges of the crescent
-    local crescent_cube_left = translate(-(r_a), meshDistance + m * 2, 0) * cube(crescent_root_radius + c, crescent_root_radius + c, b + 0.1);  -- Left cube to remove sharp edges of the crescent
-    local crescent_main = translate(0, 0, b / 2 + 0.1) * difference(ccylinder(crescent_outer_radius - c * 2, b), crescent_circle);  -- Crescent with sharp edges
-    emit(intersection(difference(crescent_main, crescent_cube_right), difference(crescent_main, crescent_cube_left)), 0); -- Crescent formation without sharp edges
+    local crescent_cube_right = translate(r_a + c, meshDistance + m * 2, 0) *
+        cube(crescent_root_radius + c, crescent_root_radius + c, b + 0.1);  -- Right cube to remove sharp edges of the crescent
+    local crescent_cube_left = translate(-(r_a), meshDistance + m * 2, 0) *
+        cube(crescent_root_radius + c, crescent_root_radius + c, b + 0.1);  -- Left cube to remove sharp edges of the crescent
+    local crescent_main = translate(0, 0, b / 2 + 0.1) *
+        difference(ccylinder(crescent_outer_radius - c * 2, b), crescent_circle);  -- Crescent with sharp edges
+    emit(translate(0, 0, 80) * intersection(difference(crescent_main, crescent_cube_right), difference(crescent_main, crescent_cube_left)), 0); -- Crescent formation without sharp edges
     set_brush_color(0, 0.2, 0.2, 0.2); -- Set color for crescent and gear housing
 end
 
 -- Gear Formation
-
 gear_formation();
